@@ -19,6 +19,15 @@ def save_posts(posts):
     with open('static/storage.json', 'w') as f:
         json.dump(posts, f, indent=4)
 
+
+def fetch_post_by_id(post_id):
+    posts = load_posts()
+    for post in posts:
+        if post['id'] == post_id:
+            return post
+    return None
+
+
 @app.route('/')
 def index():
     blog_posts = load_posts()
@@ -56,17 +65,32 @@ def add():
 
 @app.route('/delete/<int:post_id>', methods=['POST'])
 def delete(post_id):
-    # Load existing posts
+    """delete post route"""
     blog_posts = load_posts()
-
-    # Remove the post with the given ID
     blog_posts = [post for post in blog_posts if post['id'] != post_id]
-
-    # Save the updated list back to the JSON file
     save_posts(blog_posts)
-
-    # Redirect to the home page
     return redirect(url_for('index'))
+
+
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    """update post route"""
+    post = fetch_post_by_id(post_id)#create later fetcher function
+    if post is None:
+        return "Post not found", 404
+    if request.method == 'POST':
+        post['author'] = request.form.get('author')
+        post['title'] = request.form.get('title')
+        post['content'] = request.form.get('content')
+
+        blog_posts = load_posts()
+        for idx, p in enumerate(blog_posts):
+            if p['id'] == post_id:
+                blog_posts[idx] = post
+                break
+        save_posts(blog_posts)
+        return redirect(url_for('index'))
+    return render_template('update.html', post=post)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
