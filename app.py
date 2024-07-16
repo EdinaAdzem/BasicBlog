@@ -78,6 +78,7 @@ def update(post_id):
     post = fetch_post_by_id(post_id)#create later fetcher function
     if post is None:
         return "Post not found", 404
+    #update and redirect to index
     if request.method == 'POST':
         post['author'] = request.form.get('author')
         post['title'] = request.form.get('title')
@@ -91,6 +92,21 @@ def update(post_id):
         save_posts(blog_posts)
         return redirect(url_for('index'))
     return render_template('update.html', post=post)
+
+#trying the bonus like button
+@app.route('/like/<int:post_id>', methods=['POST'])
+def like(post_id):
+    blog_posts = load_posts()
+
+    for post in blog_posts:
+        if post['id'] == post_id:
+            post['likes'] += 1
+            break
+
+    save_posts(blog_posts)
+
+    return redirect(url_for('index'))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
