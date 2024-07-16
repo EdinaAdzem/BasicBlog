@@ -4,16 +4,12 @@ import os
 app = Flask(__name__)
 
 def load_posts():
-    try:
-        with open('static/storage.json') as f:
-            posts = json.load(f)
-            return posts
-    except FileNotFoundError:
-        print("File not found. Ensure 'static/storage.json' exists.")
-        return []
-    except json.JSONDecodeError:
-        print("Error decoding JSON. Ensure 'static/storage.json' contains valid JSON.")
-        return []
+    with open('static/storage.json') as f:
+        posts = json.load(f)
+        for post in posts:
+            if 'likes' not in post:
+                post['likes'] = 0
+        return posts
 
 def save_posts(posts):
     with open('static/storage.json', 'w') as f:
@@ -36,15 +32,11 @@ def index():
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
-        # Get form data
         author = request.form.get('author')
         title = request.form.get('title')
         content = request.form.get('content')
-
-        # Load existing posts
         blog_posts = load_posts()
 
-        # Create new post with a unique ID
         new_post = {
             'id': max([post['id'] for post in blog_posts], default=0) + 1,
             'author': author,
@@ -52,13 +44,8 @@ def add():
             'content': content
         }
 
-        # Add new post to the list
         blog_posts.append(new_post)
-
-        # Save posts back to the JSON file
         save_posts(blog_posts)
-
-        # Redirect to the home page
         return redirect(url_for('index'))
 
     return render_template('add.html')
@@ -102,9 +89,7 @@ def like(post_id):
         if post['id'] == post_id:
             post['likes'] += 1
             break
-
     save_posts(blog_posts)
-
     return redirect(url_for('index'))
 
 

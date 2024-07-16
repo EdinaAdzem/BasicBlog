@@ -3,12 +3,14 @@
         "author": "Edina Adzem",
         "content": "Super Interesting",
         "id": 3,
+        "likes": 1,
         "title": "Flask"
     },
     {
         "author": "Mak Dizdar",
         "content": "Gor\u010din\r\nAse le\u017eit\r\nVojnik Gor\u010din\r\nU zemlji svojoj\r\nNa ba\u0161tini\r\nTu\u017edi",
         "id": 4,
+        "likes": 1,
         "title": "Gorcin"
     }
 ]
